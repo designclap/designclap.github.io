@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>admin — Clap Design Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+:root{
+  --bg:#0f0f0f;--bg2:#161616;--bg3:#1e1e1e;
+  --fg:#ece9e3;--mid:#aaa;--dim:#666;
+  --line:rgba(236,233,227,.1);--line2:rgba(236,233,227,.18);
+  --accent:#ece9e3;
+  --red:rgba(255,80,80,.8);
+  --mont:'Montserrat',sans-serif;--pre:'Pretendard',sans-serif;--robo:'Roboto',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--pre);background:var(--bg);color:var(--fg);min-height:100vh;display:grid;grid-template-columns:240px 1fr;}
+
+/* ── Sidebar ── */
+.sidebar{background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-logo{padding:2rem 1.5rem 1.5rem;border-bottom:1px solid var(--line);}
+.sidebar-logo a{font-family:var(--mont);font-size:.6rem;font-weight:500;letter-spacing:.08em;color:var(--fg);text-decoration:none;}
+.sidebar-logo p{font-family:var(--mont);font-size:.42rem;font-weight:300;letter-spacing:.12em;text-transform:lowercase;color:var(--dim);margin-top:.3rem;}
+.sidebar-nav{padding:1rem 0;flex:1;}
+.sidebar-nav a{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.5rem;font-family:var(--mont);font-size:.5rem;font-weight:300;letter-spacing:.14em;text-transform:lowercase;color:var(--mid);text-decoration:none;transition:color .2s,background .2s;border-left:2px solid transparent;}
+.sidebar-nav a:hover{color:var(--fg);background:rgba(236,233,227,.03);}
+.sidebar-nav a.active{color:var(--fg);border-left-color:var(--fg);background:rgba(236,233,227,.04);}
+.sidebar-nav a svg{width:14px;height:14px;opacity:.6;flex-shrink:0;}
+.sidebar-footer{padding:1.5rem;border-top:1px solid var(--line);}
+.sidebar-footer a{font-family:var(--mont);font-size:.44rem;font-weight:300;letter-spacing:.14em;text-transform:lowercase;color:var(--dim);text-decoration:none;display:flex;align-items:center;gap:.5rem;transition:color .2s;}
+.sidebar-footer a:hover{color:var(--fg);}
+
+/* ── Main ── */
+.main{overflow-y:auto;min-height:100vh;}
+.main-header{padding:2.5rem 3rem 2rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:10;backdrop-filter:blur(8px);}
+.main-title{font-family:var(--mont);font-size:.55rem;font-weight:400;letter-spacing:.22em;text-transform:lowercase;color:var(--mid);}
+.btn-new{font-family:var(--mont);font-size:.46rem;font-weight:400;letter-spacing:.16em;text-transform:lowercase;background:var(--fg);color:var(--bg);border:none;padding:10px 20px;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;gap:.5rem;}
+.btn-new:hover{opacity:.85;}
+.btn-new svg{width:12px;height:12px;}
+
+/* ── Stats ── */
+.stats{padding:2rem 3rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line);}
+.stat{background:var(--bg);padding:1.5rem;}
+.stat-n{font-family:var(--mont);font-size:1.8rem;font-weight:300;letter-spacing:-.02em;margin-bottom:.4rem;}
+.stat-l{font-family:var(--mont);font-size:.44rem;font-weight:300;letter-spacing:.16em;text-transform:lowercase;color:var(--dim);}
+
+/* ── Project list ── */
+.project-list{padding:0 3rem 3rem;}
+.list-table{width:100%;border-collapse:collapse;margin-top:2rem;}
+.list-table th{font-family:var(--mont);font-size:.42rem;font-weight:300;letter-spacing:.18em;text-transform:lowercase;color:var(--dim);padding:.75rem 1rem;border-bottom:1px solid var(--line);text-align:left;}
+.list-table th:first-child{padding-left:0;}
+.list-row{border-bottom:1px solid var(--line);transition:background .15s;}
+.list-row:hover{background:rgba(236,233,227,.02);}
+.list-row td{padding:1.1rem 1rem;vertical-align:middle;}
+.list-row td:first-child{padding-left:0;}
+.td-thumb{width:64px;}
+.thumb-box{width:56px;height:40px;background:var(--bg3);overflow:hidden;flex-shrink:0;}
+.thumb-box img{width:100%;height:100%;object-fit:cover;}
+.thumb-box-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:.2;}
+.td-title .t-main{font-family:var(--pre);font-size:.82rem;font-weight:400;margin-bottom:.2rem;}
+.td-title .t-sub{font-family:var(--robo);font-size:.6rem;font-weight:300;color:var(--dim);}
+.td-tags{display:flex;gap:.3rem;flex-wrap:wrap;}
+.tag-chip{font-family:var(--mont);font-size:.4rem;font-weight:300;letter-spacing:.1em;text-transform:lowercase;border:1px solid var(--line2);padding:2px 8px;color:var(--mid);}
+.td-year{font-family:var(--mont);font-size:.52rem;font-weight:300;color:var(--dim);}
+.td-feat{text-align:center;}
+.feat-dot{width:6px;height:6px;border-radius:50%;background:var(--dim);display:inline-block;}
+.feat-dot.on{background:#6ee7b7;}
+.td-actions{display:flex;gap:.5rem;justify-content:flex-end;}
+.btn-edit,.btn-del{background:transparent;border:1px solid var(--line);padding:6px 12px;cursor:pointer;font-family:var(--mont);font-size:.4rem;font-weight:300;letter-spacing:.12em;text-transform:lowercase;transition:border-color .2s,color .2s;}
+.btn-edit{color:var(--mid);}
+.btn-edit:hover{border-color:var(--line2);color:var(--fg);}
+.btn-del{color:var(--dim);}
+.btn-del:hover{border-color:var(--red);color:var(--red);}
+
+/* ── Modal ── */
+.modal-bg{position:fixed;inset:0;background:rgba(10,10,10,.88);backdrop-filter:blur(8px);z-index:100;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:3rem 1.5rem;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg2);width:100%;max-width:680px;border:1px solid var(--line2);padding:0;position:relative;margin:auto;}
+.modal-head{padding:1.75rem 2rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;}
+.modal-head-title{font-family:var(--mont);font-size:.52rem;font-weight:400;letter-spacing:.18em;text-transform:lowercase;color:var(--mid);}
+.modal-close{background:none;border:none;color:var(--dim);cursor:pointer;font-size:.9rem;font-family:var(--mont);opacity:.6;transition:opacity .2s;}
+.modal-close:hover{opacity:1;}
+.modal-body{padding:2rem;}
+.form-row{margin-bottom:1.4rem;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.4rem;}
+label{display:block;font-family:var(--mont);font-size:.44rem;font-weight:300;letter-spacing:.16em;text-transform:lowercase;color:var(--dim);margin-bottom:.5rem;}
+input[type=text],input[type=number],textarea,select{
+  width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--fg);
+  font-family:var(--pre);font-size:.78rem;font-weight:300;
+  padding:.75rem 1rem;outline:none;transition:border-color .2s;
+}
+input[type=text]:focus,input[type=number]:focus,textarea:focus{border-color:var(--line2);}
+textarea{resize:vertical;min-height:80px;line-height:1.7;}
+.tags-select{display:flex;flex-wrap:wrap;gap:.5rem;padding:.75rem;background:var(--bg3);border:1px solid var(--line);}
+.tag-toggle{font-family:var(--mont);font-size:.42rem;font-weight:300;letter-spacing:.1em;text-transform:lowercase;border:1px solid var(--line);padding:5px 12px;cursor:pointer;background:transparent;color:var(--dim);transition:border-color .2s,color .2s,background .2s;}
+.tag-toggle.selected{border-color:var(--fg);color:var(--fg);background:rgba(236,233,227,.06);}
+.feat-toggle{display:flex;align-items:center;gap:.75rem;cursor:pointer;}
+.feat-toggle input{display:none;}
+.toggle-track{width:36px;height:20px;background:var(--bg3);border:1px solid var(--line);border-radius:10px;position:relative;transition:background .2s;}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:var(--dim);transition:transform .2s,background .2s;}
+input:checked + .toggle-track{background:rgba(110,231,183,.1);border-color:rgba(110,231,183,.4);}
+input:checked + .toggle-track::after{transform:translateX(16px);background:#6ee7b7;}
+.feat-label{font-family:var(--mont);font-size:.46rem;font-weight:300;letter-spacing:.12em;text-transform:lowercase;color:var(--mid);}
+.upload-zone{border:1px dashed var(--line2);padding:1.5rem;text-align:center;cursor:pointer;background:var(--bg3);transition:border-color .2s;}
+.upload-zone:hover{border-color:rgba(236,233,227,.3);}
+.upload-zone p{font-family:var(--mont);font-size:.46rem;font-weight:300;letter-spacing:.14em;text-transform:lowercase;color:var(--dim);margin-top:.5rem;}
+.upload-zone small{font-family:var(--mont);font-size:.4rem;letter-spacing:.1em;color:var(--gray);opacity:.5;}
+.upload-preview{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;}
+.upload-preview img{width:64px;height:48px;object-fit:cover;opacity:.7;}
+.modal-foot{padding:1.25rem 2rem;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;gap:.75rem;}
+.btn-cancel{font-family:var(--mont);font-size:.44rem;font-weight:300;letter-spacing:.14em;text-transform:lowercase;background:transparent;border:1px solid var(--line);color:var(--mid);padding:9px 18px;cursor:pointer;transition:border-color .2s,color .2s;}
+.btn-cancel:hover{border-color:var(--line2);color:var(--fg);}
+.btn-save{font-family:var(--mont);font-size:.44rem;font-weight:400;letter-spacing:.14em;text-transform:lowercase;background:var(--fg);color:var(--bg);border:none;padding:9px 22px;cursor:pointer;transition:opacity .2s;}
+.btn-save:hover{opacity:.85;}
+
+/* Toast */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--bg3);border:1px solid var(--line2);padding:.85rem 1.5rem;font-family:var(--mont);font-size:.46rem;font-weight:300;letter-spacing:.14em;text-transform:lowercase;color:var(--fg);z-index:200;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* Tags page */
+.tags-manager{padding:2rem 3rem;}
+.tags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1px;background:var(--line);margin-top:2rem;}
+.tag-card{background:var(--bg);padding:1.25rem;display:flex;align-items:center;justify-content:space-between;}
+.tag-card-name{font-family:var(--mont);font-size:.52rem;font-weight:300;letter-spacing:.1em;text-transform:lowercase;}
+.tag-card-count{font-family:var(--mont);font-size:.42rem;font-weight:300;letter-spacing:.1em;color:var(--dim);}
+.add-tag-row{display:flex;gap:.75rem;margin-top:1.5rem;}
+.add-tag-row input{flex:1;}
+.btn-add-tag{font-family:var(--mont);font-size:.44rem;font-weight:400;letter-spacing:.14em;text-transform:lowercase;background:var(--fg);color:var(--bg);border:none;padding:9px 18px;cursor:pointer;white-space:nowrap;}
+
+@media(max-width:900px){
+  body{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .project-list{padding:0 1.5rem 2rem;}
+  .main-header{padding:1.5rem;}
+}
+
+/* Logo image mode */
+.nav-logo img { height:28px; width:auto; display:block; }
+.foot-logo img { height:20px; width:auto; display:block; opacity:.7; }
+.nav-logo-text { font-family:var(--mont); font-size:.62rem; font-weight:500; letter-spacing:.08em; color:var(--fg); }
+.foot-logo-text { font-family:var(--mont); font-size:.58rem; font-weight:400; letter-spacing:.08em; color:var(--fg); opacity:.7; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html" id="adminNavLogo">Clap Design Studio</a>
+    <p>content management</p>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" class="active" onclick="showPage('projects',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      all projects
+    </a>
+    <a href="#" onclick="showPage('tags',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      tags
+    </a>
+    <a href="#" onclick="showPage('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      settings
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="index.html" target="_blank">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      view site
+    </a>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- Projects Page -->
+  <div id="page-projects">
+    <div class="main-header">
+      <span class="main-title">projects</span>
+      <button class="btn-new" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        new project
+      </button>
+    </div>
+    <div class="stats" id="statsBar"></div>
+    <div class="project-list">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th style="width:64px;"></th>
+            <th>project</th>
+            <th>tags</th>
+            <th>year</th>
+            <th style="width:60px;text-align:center;">featured</th>
+            <th style="width:130px;"></th>
+          </tr>
+        </thead>
+        <tbody id="projectList"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tags Page -->
+  <div id="page-tags" style="display:none;">
+    <div class="main-header">
+      <span class="main-title">tags</span>
+    </div>
+    <div class="tags-manager">
+      <div class="tags-grid" id="tagsGrid"></div>
+      <div class="add-tag-row">
+        <input type="text" id="newTagInput" placeholder="new tag name">
+        <button class="btn-add-tag" onclick="addTag()">add tag</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Page -->
+  <div id="page-settings" style="display:none;">
+    <div class="main-header">
+      <span class="main-title">settings</span>
+    </div>
+    <div style="padding:2rem 3rem;">
+
+      <!-- Logo upload -->
+      <div class="form-row" style="max-width:480px;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid var(--line);">
+        <label style="margin-bottom:1rem;">logo image
+          <span style="color:var(--dim);font-size:.38rem;display:block;margin-top:.25rem;font-weight:300;letter-spacing:.08em;text-transform:none;">
+            권장 사이즈: SVG 또는 PNG · 높이 28–32px 기준 · 가로 최대 160px · 배경 투명 · 흰색 또는 밝은 톤
+          </span>
+        </label>
+        <div id="logoPreviewWrap" style="margin-bottom:1rem;min-height:40px;display:flex;align-items:center;gap:1.5rem;">
+          <div id="logoPreview" style="height:32px;display:flex;align-items:center;">
+            <span style="font-family:var(--mont);font-size:.55rem;font-weight:500;letter-spacing:.08em;color:var(--mid);">Clap Design Studio</span>
+          </div>
+          <button id="logoRemoveBtn" onclick="removeLogo()" style="display:none;font-family:var(--mont);font-size:.4rem;letter-spacing:.12em;text-transform:lowercase;background:transparent;border:1px solid var(--line);color:var(--dim);padding:4px 10px;cursor:pointer;">remove</button>
+        </div>
+        <div class="upload-zone" id="logoDropZone" onclick="document.getElementById('logoFileInput').click()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin:0 auto .5rem;display:block;opacity:.3;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>click to upload logo</p>
+          <small>SVG · PNG · max 2MB · transparent background recommended</small>
+        </div>
+        <input type="file" id="logoFileInput" accept=".svg,.png,.jpg,.jpeg" style="display:none;" onchange="handleLogoUpload(event)">
+        <div style="margin-top:.75rem;">
+          <label style="margin-bottom:.4rem;">or enter image url / path</label>
+          <input type="text" id="logoPathInput" placeholder="images/logo.svg" oninput="previewLogoPath(this.value)">
+        </div>
+      </div>
+
+      <!-- Favicon upload -->
+      <div class="form-row" style="max-width:480px;margin-bottom:2.5rem;padding-bottom:2.5rem;border-bottom:1px solid var(--line);">
+        <label style="margin-bottom:1rem;">favicon
+          <span style="color:var(--dim);font-size:.38rem;display:block;margin-top:.25rem;font-weight:300;letter-spacing:.08em;text-transform:none;">
+            권장 사이즈: ICO · PNG · SVG · 32×32px 또는 64×64px · 배경 투명
+          </span>
+        </label>
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div id="faviconPreview"><span style="font-size:.5rem;color:var(--dim);">no favicon</span></div>
+          <button id="faviconRemoveBtn" onclick="removeFavicon()" style="display:none;font-family:var(--mont);font-size:.4rem;letter-spacing:.12em;text-transform:lowercase;background:transparent;border:1px solid var(--line);color:var(--dim);padding:4px 10px;cursor:pointer;">remove</button>
+        </div>
+        <div class="upload-zone" onclick="document.getElementById('faviconFileInput').click()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin:0 auto .5rem;display:block;opacity:.3;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>click to upload favicon</p>
+          <small>ICO · PNG · SVG · 32×32px recommended</small>
+        </div>
+        <input type="file" id="faviconFileInput" accept=".ico,.png,.svg,.jpg" style="display:none;" onchange="handleFaviconUpload(event)">
+      </div>
+
+      <div class="form-row" style="max-width:480px;">
+        <label>studio name</label>
+        <input type="text" value="Clap Design Studio">
+      </div>
+      <div class="form-row" style="max-width:480px;">
+        <label>established</label>
+        <input type="text" value="2015">
+      </div>
+      <div class="form-row" style="max-width:480px;">
+        <label>email</label>
+        <input type="text" value="contact@designclap.com">
+      </div>
+      <div class="form-row" style="max-width:480px;">
+        <label>phone</label>
+        <input type="text" value="010.7102.6207">
+      </div>
+      <div class="form-row" style="max-width:480px;">
+        <label>address</label>
+        <input type="text" value="서울시 강남구 언주로 425, B1 #231">
+      </div>
+      <div style="margin-top:1.5rem;">
+        <button class="btn-save" onclick="saveSettings()">save settings</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Edit/Add Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-head-title" id="modalTitle">new project</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editSlug">
+      <div class="form-row-2">
+        <div>
+          <label>project title (한글)</label>
+          <input type="text" id="fTitle" placeholder="홀브라운 베이커리">
+        </div>
+        <div>
+          <label>title (english)</label>
+          <input type="text" id="fTitleEn" placeholder="Whole Brown Bakery">
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label>client</label>
+          <input type="text" id="fClient" placeholder="클라이언트명">
+        </div>
+        <div>
+          <label>year</label>
+          <input type="number" id="fYear" placeholder="2025" min="2000" max="2099">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>slug (url용 영문, 소문자-하이픈)</label>
+        <input type="text" id="fSlug" placeholder="wholbrown-bakery">
+      </div>
+      <div class="form-row">
+        <label>description</label>
+        <textarea id="fDesc" placeholder="프로젝트 설명을 입력하세요."></textarea>
+      </div>
+      <div class="form-row">
+        <label>tags</label>
+        <div class="tags-select" id="tagsSelect"></div>
+      </div>
+      <div class="form-row">
+        <label>썸네일 이미지 경로 <span style="color:var(--dim);font-size:.38rem;">— 목록/홈에 표시</span></label>
+        <input type="text" id="fThumb" placeholder="images/wholbrown/thumb.jpg">
+        <div id="thumbPreview" style="margin-top:.5rem;"></div>
+      </div>
+      <div class="form-row">
+        <label>상세 이미지 경로 <span style="color:var(--dim);font-size:.38rem;">— 팝업 갤러리에 표시, 한 줄에 하나씩</span></label>
+        <textarea id="fImages" placeholder="images/wholbrown/detail-01.jpg&#10;images/wholbrown/detail-02.jpg&#10;images/wholbrown/detail-03.jpg" style="min-height:100px;font-size:.68rem;line-height:1.9;"></textarea>
+        <div id="imagesPreview" style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap;"></div>
+      </div>
+      <div class="form-row">
+        <label style="cursor:pointer;" for="featCheck">
+          <div class="feat-toggle">
+            <input type="checkbox" id="featCheck">
+            <div class="toggle-track"></div>
+            <span class="feat-label">featured on home page</span>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">cancel</button>
+      <button class="btn-save" onclick="saveProject()">save project</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="projects.js"></script>
+<script>
+let projects = getProjects();
+let tags = JSON.parse(localStorage.getItem('clap_tags') || JSON.stringify(ALL_TAGS));
+
+// ── Page switching ──
+function showPage(name, el){
+  document.querySelectorAll('.main > div[id^="page-"]').forEach(d=>d.style.display='none');
+  document.getElementById('page-'+name).style.display='block';
+  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='projects') renderList();
+  if(name==='tags') renderTags();
+}
+
+// ── Stats ──
+function renderStats(){
+  const total = projects.length;
+  const featured = projects.filter(p=>p.featured).length;
+  const cats = [...new Set(projects.flatMap(p=>p.tags))].length;
+  const latest = projects.reduce((max,p)=>p.year>max?p.year:max, 0);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="stat-n">${total}</div><div class="stat-l">total projects</div></div>
+    <div class="stat"><div class="stat-n">${featured}</div><div class="stat-l">featured</div></div>
+    <div class="stat"><div class="stat-n">${cats}</div><div class="stat-l">tag types</div></div>
+    <div class="stat"><div class="stat-n">${latest}</div><div class="stat-l">latest year</div></div>
+  `;
+}
+
+// ── Project list ──
+function renderList(){
+  renderStats();
+  const tbody = document.getElementById('projectList');
+  tbody.innerHTML = projects.map((p,i) => `
+    <tr class="list-row">
+      <td class="td-thumb">
+        <div class="thumb-box">
+          ${p.thumb
+            ? `<img src="${p.thumb}" alt="" onerror="this.style.display='none'">`
+            : `<div class="thumb-box-ph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
+          }
+        </div>
+      </td>
+      <td class="td-title">
+        <div class="t-main">${p.title}</div>
+        <div class="t-sub">client. ${p.client} · ${(p.images||[]).length} detail image${(p.images||[]).length!==1?'s':''}</div>
+      </td>
+      <td><div class="td-tags">${p.tags.map(t=>`<span class="tag-chip">${t.toLowerCase()}</span>`).join('')}</div></td>
+      <td class="td-year">${p.year}</td>
+      <td class="td-feat"><span class="feat-dot ${p.featured?'on':''}"></span></td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-edit" onclick="openModal(${i})">edit</button>
+          <button class="btn-del" onclick="deleteProject(${i})">delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── Tags ──
+function renderTags(){
+  const grid = document.getElementById('tagsGrid');
+  grid.innerHTML = tags.map(t => {
+    const count = projects.filter(p=>p.tags.includes(t)).length;
+    return `
+      <div class="tag-card">
+        <span class="tag-card-name">${t.toLowerCase()}</span>
+        <span class="tag-card-count">${count}</span>
+      </div>`;
+  }).join('');
+}
+
+function addTag(){
+  const input = document.getElementById('newTagInput');
+  const val = input.value.trim();
+  if(!val) return;
+  const formatted = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+  if(tags.includes(formatted)){ showToast('tag already exists.'); return; }
+  tags.push(formatted);
+  localStorage.setItem('clap_tags', JSON.stringify(tags));
+  input.value = '';
+  renderTags();
+  showToast(`tag "${formatted.toLowerCase()}" added.`);
+}
+
+// ── Modal ──
+function buildTagsSelect(selected=[]){
+  document.getElementById('tagsSelect').innerHTML = tags.map(t => `
+    <button type="button" class="tag-toggle ${selected.includes(t)?'selected':''}"
+      onclick="toggleTag(this,'${t}')">${t.toLowerCase()}</button>
+  `).join('');
+}
+
+function toggleTag(btn, tag){
+  btn.classList.toggle('selected');
+}
+
+function getSelectedTags(){
+  return [...document.querySelectorAll('.tag-toggle.selected')].map(b=>b.textContent.trim().charAt(0).toUpperCase()+b.textContent.trim().slice(1));
+}
+
+let editingIdx = null;
+
+function openModal(idx=null){
+  editingIdx = idx;
+  document.getElementById('modalTitle').textContent = idx===null ? 'new project' : 'edit project';
+  const p = idx !== null ? projects[idx] : null;
+  document.getElementById('fTitle').value   = p?.title || '';
+  document.getElementById('fTitleEn').value = p?.title_en || '';
+  document.getElementById('fClient').value  = p?.client || '';
+  document.getElementById('fYear').value    = p?.year || new Date().getFullYear();
+  document.getElementById('fSlug').value    = p?.slug || '';
+  document.getElementById('fDesc').value    = p?.desc || '';
+  document.getElementById('fThumb').value   = p?.thumb || '';
+  document.getElementById('fImages').value  = p?.images ? p.images.join('\n') : '';
+  document.getElementById('featCheck').checked = p?.featured || false;
+  updateThumbPreview();
+  updateImagesPreview();
+  buildTagsSelect(p?.tags || []);
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('open');
+  editingIdx = null;
+}
+
+function saveProject(){
+  const title = document.getElementById('fTitle').value.trim();
+  const slug  = document.getElementById('fSlug').value.trim();
+  if(!title || !slug){ showToast('title and slug are required.'); return; }
+
+  const p = {
+    slug,
+    title,
+    title_en: document.getElementById('fTitleEn').value.trim(),
+    client:   document.getElementById('fClient').value.trim(),
+    year:     parseInt(document.getElementById('fYear').value) || new Date().getFullYear(),
+    tags:     getSelectedTags(),
+    thumb:    document.getElementById('fThumb').value.trim(),
+    images: (document.getElementById('fImages').value || '')
+               .split('\n')
+               .map(s => s.trim())
+               .filter(Boolean),
+    desc:     document.getElementById('fDesc').value.trim(),
+    featured: document.getElementById('featCheck').checked,
+  };
+
+  if(editingIdx !== null){
+    projects[editingIdx] = p;
+  } else {
+    projects.unshift(p); // 최신 순으로 맨 앞에 추가
+  }
+
+  saveProjects(projects);
+  closeModal();
+  renderList();
+  showToast(editingIdx !== null ? 'project updated.' : 'project added.');
+}
+
+function deleteProject(idx){
+  if(!confirm(`"${projects[idx].title}" 을 삭제할까요?`)) return;
+  projects.splice(idx, 1);
+  saveProjects(projects);
+  renderList();
+  showToast('project deleted.');
+}
+
+// ── Toast ──
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ── Init ──
+renderList();
+
+// ── Image preview helpers ──
+function updateThumbPreview(){
+  const val = document.getElementById('fThumb').value.trim();
+  const el  = document.getElementById('thumbPreview');
+  if(!el) return;
+  el.innerHTML = val
+    ? `<img src="${val}" style="height:56px;object-fit:cover;border:1px solid var(--line);opacity:.7;"
+           onerror="this.style.display='none'">`
+    : '';
+}
+function updateImagesPreview(){
+  const lines = (document.getElementById('fImages').value || '').split('\n').map(s=>s.trim()).filter(Boolean);
+  const el = document.getElementById('imagesPreview');
+  if(!el) return;
+  el.innerHTML = lines.map(src =>
+    `<img src="${src}" style="height:48px;width:72px;object-fit:cover;border:1px solid var(--line);opacity:.65;"
+          onerror="this.style.display='none'">`
+  ).join('');
+}
+
+document.addEventListener('input', e => {
+  if(e.target.id === 'fThumb')   updateThumbPreview();
+  if(e.target.id === 'fImages')  updateImagesPreview();
+});
+
+// Close modal on bg click
+document.getElementById('modalBg').addEventListener('click', e=>{
+  if(e.target === document.getElementById('modalBg')) closeModal();
+});
+
+// ── Logo management ────────────────────────────────
+(function initLogo(){
+  const saved = localStorage.getItem('clap_logo');
+  if(saved){
+    applyLogoPreview(saved);
+    applyLogoToAdmin(saved);
+  }
+  // Favicon
+  const favicon = localStorage.getItem('clap_favicon');
+  if(favicon) applyFavicon(favicon);
+})();
+
+function handleLogoUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 2 * 1024 * 1024){ showToast('file too large. max 2mb.'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const src = ev.target.result;
+    localStorage.setItem('clap_logo', src);
+    applyLogoPreview(src);
+    applyLogoToAdmin(src);
+    showToast('logo uploaded.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewLogoPath(val){
+  if(val.trim()) applyLogoPreview(val.trim());
+}
+
+function applyLogoPreview(src){
+  const wrap = document.getElementById('logoPreview');
+  wrap.innerHTML = `<img src="${src}" alt="Clap Design Studio"
+    style="height:28px;width:auto;max-width:160px;object-fit:contain;"
+    onerror="this.style.display='none'">`;
+  document.getElementById('logoRemoveBtn').style.display = 'inline-block';
+  document.getElementById('logoPathInput').value =
+    src.startsWith('data:') ? '(uploaded file)' : src;
+}
+
+function applyLogoToAdmin(src){
+  const el = document.getElementById('adminNavLogo');
+  if(el) el.innerHTML = `<img src="${src}" alt="Clap Design Studio"
+    style="height:22px;width:auto;max-width:140px;object-fit:contain;
+    filter:brightness(0) invert(1);opacity:.75;"
+    onerror="this.style.display='none'">`;
+}
+
+function removeLogo(){
+  localStorage.removeItem('clap_logo');
+  document.getElementById('logoPreview').innerHTML =
+    `<span style="font-family:var(--mont);font-size:.55rem;font-weight:500;letter-spacing:.08em;color:var(--mid);">Clap Design Studio</span>`;
+  document.getElementById('logoRemoveBtn').style.display = 'none';
+  document.getElementById('logoPathInput').value = '';
+  const el = document.getElementById('adminNavLogo');
+  if(el) el.textContent = 'Clap Design Studio';
+  showToast('logo removed. using text fallback.');
+}
+
+// ── Favicon ──────────────────────────────────────────
+function applyFavicon(src){
+  let link = document.getElementById('dynFavicon');
+  if(!link){
+    link = document.createElement('link');
+    link.id = 'dynFavicon';
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = src;
+  // update preview
+  const prev = document.getElementById('faviconPreview');
+  if(prev) prev.innerHTML = `<img src="${src}" style="width:32px;height:32px;object-fit:contain;border:1px solid var(--line);padding:4px;background:#1a1a1a;" onerror="this.style.display='none'">`;
+  const removeBtn = document.getElementById('faviconRemoveBtn');
+  if(removeBtn) removeBtn.style.display = 'inline-block';
+}
+
+function handleFaviconUpload(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > 1024 * 1024){ showToast('file too large. max 1mb.'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    localStorage.setItem('clap_favicon', ev.target.result);
+    applyFavicon(ev.target.result);
+    showToast('favicon uploaded.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeFavicon(){
+  localStorage.removeItem('clap_favicon');
+  const prev = document.getElementById('faviconPreview');
+  if(prev) prev.innerHTML = `<span style="font-size:.5rem;color:var(--dim);">no favicon</span>`;
+  document.getElementById('faviconRemoveBtn').style.display = 'none';
+  // remove from head
+  const link = document.getElementById('dynFavicon');
+  if(link) link.remove();
+  showToast('favicon removed.');
+}
+
+function saveSettings(){
+  const pathVal = document.getElementById('logoPathInput').value.trim();
+  if(pathVal && !pathVal.startsWith('(') && !pathVal.startsWith('data:')){
+    localStorage.setItem('clap_logo', pathVal);
+    applyLogoToAdmin(pathVal);
+  }
+  showToast('settings saved.');
+}
+</script>
+</body>
+</html>
